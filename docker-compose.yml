@@ -1,0 +1,12 @@
+version: '2.4'
+
+services:
+  grocery:
+    build: ./
+    command:
+      - /app
+      - -config
+      - /etc/grocery/config/config.yaml
+    volumes:
+      - ./grocery.db:/etc/grocery/storage/grocery.db
+      - ./config.docker.yaml:/etc/grocery/config/config.yaml

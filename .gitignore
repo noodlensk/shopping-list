@@ -1,0 +1,5 @@
+.idea
+grocery.db
+shopping-list
+/config.yaml
+/config.docker.yaml
