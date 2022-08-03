@@ -50,6 +50,8 @@ func NewTelegram(token string, allowedUsersID []int64, application *app.Applicat
 		ctx := context.Background()
 
 		switch update.Message.Text {
+		case "/start":
+			continue
 		case "/refresh":
 			break
 		case "/clear":
