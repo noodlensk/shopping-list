@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/boltdb/bolt"
-	"github.com/noodlensk/shopping-list/internal/grocery/domain/list"
 	"sort"
 	"strings"
+
+	"github.com/boltdb/bolt"
+
+	"github.com/noodlensk/shopping-list/internal/grocery/domain/list"
 )
 
 type ListBoltDBRepository struct{ db *bolt.DB }
@@ -80,8 +82,10 @@ func (r ListBoltDBRepository) DeleteItem(ctx context.Context, name string) error
 	return err
 }
 
-func (r ListBoltDBRepository) ListItems(ctx context.Context) (items []list.Item, err error) {
-	err = r.db.View(func(tx *bolt.Tx) error {
+func (r ListBoltDBRepository) ListItems(ctx context.Context) ([]list.Item, error) {
+	var items []list.Item
+
+	err := r.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("grocery"))
 
 		err := b.ForEach(func(k, v []byte) error {
@@ -118,5 +122,5 @@ func (r ListBoltDBRepository) ListItems(ctx context.Context) (items []list.Item,
 		return nil
 	})
 
-	return items, nil
+	return items, err
 }

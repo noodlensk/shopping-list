@@ -1,0 +1,7 @@
+Telegram:
+  Token: "mySecretToken"
+  AllowedUsers:
+  - 00000000 # Dmitry
+  - 11111111 # Kristina
+Storage:
+  Path: ./grocery.db

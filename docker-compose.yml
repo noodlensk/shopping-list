@@ -7,6 +7,7 @@ services:
       - /app
       - -config
       - /etc/grocery/config/config.yaml
+    restart: on-failure
     volumes:
       - ./grocery.db:/etc/grocery/storage/grocery.db
       - ./config.docker.yaml:/etc/grocery/config/config.yaml

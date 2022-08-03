@@ -3,8 +3,6 @@ package list
 import (
 	"context"
 	"fmt"
-
-	"github.com/pkg/errors"
 )
 
 type Item struct {
@@ -27,15 +25,4 @@ type NotFoundError struct{ Item string }
 
 func (e NotFoundError) Error() string {
 	return fmt.Sprintf("item %q not found", e.Item)
-}
-
-func IsNotFoundError(err error) bool {
-	cause := errors.Cause(err)
-
-	switch cause.(type) {
-	case NotFoundError:
-		return true
-	default:
-		return false
-	}
 }

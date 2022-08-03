@@ -3,14 +3,16 @@ package ports
 import (
 	"context"
 	"fmt"
+	"sort"
+	"strings"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"go.uber.org/zap"
+
 	"github.com/noodlensk/shopping-list/internal/grocery/app"
 	"github.com/noodlensk/shopping-list/internal/grocery/app/command"
 	"github.com/noodlensk/shopping-list/internal/grocery/app/query"
 	"github.com/noodlensk/shopping-list/internal/grocery/domain/list"
-	"go.uber.org/zap"
-	"sort"
-	"strings"
 )
 
 func NewTelegram(token string, allowedUsersID []int64, application *app.Application, logger *zap.SugaredLogger) error {
@@ -46,6 +48,7 @@ func NewTelegram(token string, allowedUsersID []int64, application *app.Applicat
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 
 		ctx := context.Background()
+
 		switch update.Message.Text {
 		case "/refresh":
 			break
@@ -112,7 +115,6 @@ func text(list []list.Item) string {
 	var res []string
 
 	for _, item := range list {
-
 		txt := item.Name
 
 		if item.Bought {
@@ -126,15 +128,15 @@ func text(list []list.Item) string {
 }
 
 func keyboard(list []list.Item) interface{} {
-	var numericKeyboard = tgbotapi.NewReplyKeyboard()
+	numericKeyboard := tgbotapi.NewReplyKeyboard()
 
 	for _, item := range list {
-
 		txt := item.Name
 
 		if item.Bought {
 			continue
 		}
+
 		numericKeyboard.Keyboard = append(numericKeyboard.Keyboard, tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton(txt)))
 	}
 
@@ -158,6 +160,7 @@ func (l *List) Toggle(item string) {
 	itemText := item
 	toDelete := false
 	found := false
+
 	if strings.HasSuffix(item, " ✅") {
 		itemText = strings.TrimSuffix(item, " ✅")
 		toDelete = true

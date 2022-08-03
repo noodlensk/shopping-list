@@ -18,7 +18,3 @@ func NewLogger() *zap.SugaredLogger {
 
 	return zapLogger.Sugar()
 }
-
-func NewNopLogger() *zap.SugaredLogger {
-	return zap.NewNop().Sugar()
-}

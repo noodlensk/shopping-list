@@ -1,8 +1,10 @@
+setup-lint: ## Set up linter
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.47.2
 fmt: ## gofmt and goimports all go files
 	find . -name '*.go' | while read -r file; do gofmt -w -s "$$file"; goimports -w "$$file"; done
 dep: ## Get all dependencies
 	go mod download
-	go mod tidy
+	go mod tidy -compat=1.17
 build: ## Build binary
 	go build
 run: build ## Run

@@ -21,6 +21,7 @@ func (i *stringList) String() string { return strings.Join(*i, ", ") }
 
 func (i *stringList) Set(value string) error {
 	*i = append(*i, value)
+
 	return nil
 }
 
@@ -43,7 +44,7 @@ func run(logger *zap.SugaredLogger) error {
 		return fmt.Errorf("parse config: %w", err)
 	}
 
-	db, err := bolt.Open(cfg.Storage.Path, os.FileMode(0600), nil)
+	db, err := bolt.Open(cfg.Storage.Path, os.FileMode(0o600), nil)
 	if err != nil {
 		return err
 	}

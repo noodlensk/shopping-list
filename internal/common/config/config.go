@@ -1,11 +1,11 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
@@ -21,7 +21,7 @@ type Config struct {
 
 func Parse(paths ...string) (*Config, error) {
 	if len(paths) == 0 {
-		return nil, fmt.Errorf("empty path")
+		return nil, errors.New("empty path")
 	}
 
 	vp := viper.New()
@@ -34,14 +34,14 @@ func Parse(paths ...string) (*Config, error) {
 		vp.SetConfigFile(path)
 
 		if err := vp.MergeInConfig(); err != nil {
-			return nil, errors.Wrap(err, "read config")
+			return nil, fmt.Errorf("read config: %w", err)
 		}
 	}
 
 	cfg := &Config{}
 
 	if err := vp.Unmarshal(cfg); err != nil {
-		return nil, errors.Wrap(err, "unmarshal config to obj")
+		return nil, fmt.Errorf("unmarshal config to obj: %w", err)
 	}
 
 	var validationErrs []string
