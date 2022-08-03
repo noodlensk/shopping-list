@@ -2,6 +2,8 @@
 
 Telegram bot for shared shopping list.
 
+![workflow](./doc/assets/workflow.gif)
+
 ## Usage
 
 Run app in docker-compose
