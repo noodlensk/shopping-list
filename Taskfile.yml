@@ -1,0 +1,22 @@
+version: 3
+
+tasks:
+  lint:
+    desc: "🧹Lint"
+    cmd: golangci-lint run .
+
+  lint:fix:
+    desc: "🧹Lint"
+    cmd: golangci-lint run --fix .
+
+  dep:
+    desc: "📦Install all dependencies"
+    cmd: go mod tidy
+
+  build:
+    desc: "🏗Build the binary"
+    cmd: go build
+
+  default:
+    cmds:
+      - task -l

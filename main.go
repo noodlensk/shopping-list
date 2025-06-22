@@ -7,12 +7,11 @@ import (
 	"strings"
 
 	"github.com/boltdb/bolt"
-	"go.uber.org/zap"
-
 	"github.com/noodlensk/shopping-list/internal/common/config"
 	"github.com/noodlensk/shopping-list/internal/common/logs"
 	"github.com/noodlensk/shopping-list/internal/grocery/ports"
 	"github.com/noodlensk/shopping-list/internal/grocery/service"
+	"go.uber.org/zap"
 )
 
 type stringList []string

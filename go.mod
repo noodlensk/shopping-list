@@ -1,6 +1,6 @@
 module github.com/noodlensk/shopping-list
 
-go 1.17
+go 1.24
 
 require (
 	github.com/boltdb/bolt v1.3.1
