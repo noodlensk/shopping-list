@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0] - 2025-06-22
+
+### 🐛 Bug Fixes
+
+- Do not react on start msg
+
+### 🚜 Refactor
+
+- Add linter
+
+### 📚 Documentation
+
+- Add workflow gif
+
+### ⚙️ Miscellaneous Tasks
+
+- Move to a new cluster
+
 ## [unreleased]
 
 ### 🐛 Bug Fixes
