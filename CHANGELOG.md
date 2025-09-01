@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1] - 2025-09-01
+
+### 🚜 Refactor
+
+- Migrate from Makefile to Taskfile and update dependencies
+
 ## [0.1.0] - 2025-06-22
 
 ### 🐛 Bug Fixes
