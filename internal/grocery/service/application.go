@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/boltdb/bolt"
-
 	"github.com/noodlensk/shopping-list/internal/grocery/adapters"
 	"github.com/noodlensk/shopping-list/internal/grocery/app"
 	"github.com/noodlensk/shopping-list/internal/grocery/app/command"

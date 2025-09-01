@@ -17,7 +17,7 @@ func NewRemoveCompetedItemsHandler(repository list.Repository) RemoveCompetedIte
 	return RemoveCompetedItemsHandler{repository: repository}
 }
 
-func (h RemoveCompetedItemsHandler) Handle(ctx context.Context, c RemoveCompetedItems) error {
+func (h RemoveCompetedItemsHandler) Handle(ctx context.Context, _ RemoveCompetedItems) error {
 	itemsList, err := h.repository.ListItems(ctx)
 	if err != nil {
 		return fmt.Errorf("list items: %w", err)

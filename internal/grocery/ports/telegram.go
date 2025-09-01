@@ -7,12 +7,11 @@ import (
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"go.uber.org/zap"
-
 	"github.com/noodlensk/shopping-list/internal/grocery/app"
 	"github.com/noodlensk/shopping-list/internal/grocery/app/command"
 	"github.com/noodlensk/shopping-list/internal/grocery/app/query"
 	"github.com/noodlensk/shopping-list/internal/grocery/domain/list"
+	"go.uber.org/zap"
 )
 
 func NewTelegram(token string, allowedUsersID []int64, application *app.Application, logger *zap.SugaredLogger) error {

@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/boltdb/bolt"
-
 	"github.com/noodlensk/shopping-list/internal/grocery/domain/list"
 )
 
@@ -26,7 +25,7 @@ func NewListBoltDBRepository(db *bolt.DB) (*ListBoltDBRepository, error) {
 	return &ListBoltDBRepository{db: db}, nil
 }
 
-func (r ListBoltDBRepository) AddItem(ctx context.Context, name string) error {
+func (r ListBoltDBRepository) AddItem(_ context.Context, name string) error {
 	model := list.Item{Name: name}
 
 	data, err := json.Marshal(model)
@@ -42,6 +41,7 @@ func (r ListBoltDBRepository) AddItem(ctx context.Context, name string) error {
 func (r ListBoltDBRepository) UpdateItem(ctx context.Context, name string, updateFn func(ctx context.Context, i *list.Item) (*list.Item, error)) error {
 	err := r.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("grocery"))
+
 		itemRaw := b.Get([]byte(name))
 		if itemRaw != nil {
 			a := list.Item{}
@@ -68,10 +68,11 @@ func (r ListBoltDBRepository) UpdateItem(ctx context.Context, name string, updat
 	return err
 }
 
-func (r ListBoltDBRepository) DeleteItem(ctx context.Context, name string) error {
+func (r ListBoltDBRepository) DeleteItem(_ context.Context, name string) error {
 	err := r.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("grocery"))
 		data := b.Get([]byte(name))
+
 		if data != nil {
 			return b.Delete([]byte(name))
 		}
@@ -82,13 +83,13 @@ func (r ListBoltDBRepository) DeleteItem(ctx context.Context, name string) error
 	return err
 }
 
-func (r ListBoltDBRepository) ListItems(ctx context.Context) ([]list.Item, error) {
+func (r ListBoltDBRepository) ListItems(_ context.Context) ([]list.Item, error) {
 	var items []list.Item
 
 	err := r.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("grocery"))
 
-		err := b.ForEach(func(k, v []byte) error {
+		err := b.ForEach(func(_, v []byte) error {
 			a := list.Item{}
 			if err := json.Unmarshal(v, &a); err != nil {
 				return fmt.Errorf("unmarshal entity: %w", err)

@@ -1,22 +1,49 @@
 version: 3
 
 tasks:
-  lint:
-    desc: "🧹Lint"
-    cmd: golangci-lint run .
+  setup-lint:
+    desc: "🔧 Set up linter"
+    cmd: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.47.2
 
-  lint:fix:
-    desc: "🧹Lint"
-    cmd: golangci-lint run --fix .
+  fmt:
+    desc: "🎨 Format Go code with gofmt and goimports"
+    cmd: find . -name '*.go' | while read -r file; do gofmt -w -s "$$file"; goimports -w "$$file"; done
 
   dep:
-    desc: "📦Install all dependencies"
-    cmd: go mod tidy
+    desc: "📦 Get all dependencies"
+    cmds:
+      - go mod download
+      - go mod tidy
 
   build:
-    desc: "🏗Build the binary"
+    desc: "🏗 Build the binary"
     cmd: go build
 
+  run:
+    desc: "🚀 Build and run the application"
+    deps: [build]
+    cmd: ./shopping-list -config config.yaml
+
+  lint:
+    desc: "🧹 Lint the code"
+    cmd: golangci-lint run
+
+  test:
+    desc: "🧪 Run tests"
+    cmd: go test -count=1 -p=8 -parallel=8 -race ./...
+
+  lint-fix:
+    desc: "🧹 Lint and fix issues"
+    cmd: golangci-lint run --fix
+
+  start-env:
+    desc: "🐳 Start local environment with docker-compose"
+    cmd: docker-compose up -d
+
+  stop-env:
+    desc: "🐳 Stop local environment"
+    cmd: docker-compose down
+
   default:
-    cmds:
-      - task -l
+    desc: "📋 Show available tasks"
+    cmd: task -l

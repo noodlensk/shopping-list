@@ -18,6 +18,6 @@ func NewGetItemsHandler(repository list.Repository) GetItemsHandler {
 	return GetItemsHandler{repository: repository}
 }
 
-func (h GetItemsHandler) Handle(ctx context.Context, c GetItems) (Items, error) {
+func (h GetItemsHandler) Handle(ctx context.Context, _ GetItems) (Items, error) {
 	return h.repository.ListItems(ctx)
 }
