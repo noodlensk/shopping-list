@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2025-09-01
+
+### 🐛 Bug Fixes
+
+- Toggle item completion state instead of always marking as bought
+
 ## [0.1.1] - 2025-09-01
 
 ### 🚜 Refactor
