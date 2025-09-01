@@ -20,7 +20,7 @@ func NewCompleteItemHandler(repository list.Repository) CompleteItemHandler {
 
 func (h CompleteItemHandler) Handle(ctx context.Context, c CompleteItem) error {
 	return h.repository.UpdateItem(ctx, c.Name, func(_ context.Context, i *list.Item) (*list.Item, error) {
-		i.Bought = true
+		i.Bought = !i.Bought
 
 		return i, nil
 	})
