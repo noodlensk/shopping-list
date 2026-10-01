@@ -31,7 +31,9 @@ voice, removing items) is out of scope.
 | Topic | Decision |
 |---|---|
 | Item format | Plain text in normalized form: `Молоко, 2 л`, `Масло 82%, 1 пачка`, `Хлеб`. `domain.Item` is unchanged. No merging of duplicates. |
-| Who interprets the phrase | The LLM decides everything: item split, normalization, and whether the user is done. No hand-written parsing or stop words. |
+| Who interprets the phrase | The LLM decides everything: intent, item split, normalization, and whether the user is done. No hand-written parsing or stop words. |
+| Intents | Only what phase 2 handles: `add` and `unsupported`. Phase 3 extends the enum (`list`, `complete`); the schema lives in code and prompt only, so changing it later is cheap. |
+| When the LLM is called | Once per phrase (each phrase is its own webhook request). No end-of-session batch: a session can end by silence without a final request, and per-phrase replies confirm items immediately. Previous phrases of the session are not sent. |
 | LLM | `google/gemini-3.1-flash-lite` via OpenRouter, same Go SDK and structured-output approach as `../swedish-news`. Separate API key for this project. |
 | Sync vs async | Synchronous: wait for the LLM, then answer with what was added. |
 | Timeout | 2.5 s on the LLM call, to stay inside Yandex's 3 s webhook limit. |
@@ -45,25 +47,27 @@ voice, removing items) is out of scope.
 3. Otherwise call the LLM with `command` and a 2.5 s context timeout. It returns:
 
    ```json
-   {"items": ["Молоко, 2 л", "Хлеб"], "done": false}
+   {"intent": "add", "items": ["Молоко, 2 л", "Хлеб"], "done": false}
    ```
 
-4. Add each item with `Commands.AddItem`.
-5. Answer:
+4. `intent: unsupported` (for example "что в списке", "удали молоко"): add nothing, answer
+   "Пока умею только добавлять. Что добавить?", session stays open (ends if `done`).
+5. `intent: add`: add each item with `Commands.AddItem`, then answer:
    - items, not done: "Записала: молоко, 2 л; хлеб. Что ещё?", session stays open;
    - items, done: "Записала: хлеб. Готово.", session ends;
    - no items, done: "Готово.", session ends;
    - no items, not done (noise, "эээ"): "Не поняла, что добавить?", session stays open.
    If the reply would exceed 1024 characters, say "Записала N пунктов" instead of listing them.
-6. LLM error or timeout: add the raw `command` as one item and answer "Записала как есть: <command>.
+6. LLM error, timeout, or an unknown intent value: add the raw `command` as one item and answer "Записала как есть: <command>.
    Что ещё?". Nothing is lost; a wrong item is one tap to remove in Telegram. Known edge: during an
    OpenRouter outage "все спасибо" also becomes an item.
 
 ## Components
 
-- `internal/grocery/adapters/openrouter_item_parser.go`: `Parse(ctx, phrase string) (items []string,
-  done bool, err error)`. Uses `openrouter.Chat.Send` with a strict JSON schema
-  (`items: string[]`, `done: boolean`, both required, no extra properties). The system prompt is a
+- `internal/grocery/adapters/openrouter_item_parser.go`: `Parse(ctx, phrase string) (Parsed, error)`
+  where `Parsed` is `{Intent string; Items []string; Done bool}`. Uses `openrouter.Chat.Send` with a
+  strict JSON schema (`intent: "add" | "unsupported"`, `items: string[]`, `done: boolean`, all
+  required, no extra properties). The system prompt is a
   constant so provider-side prompt caching can reuse it. Logs latency and token usage per call.
 - `internal/grocery/ports/alice.go`: replaces the echo handler with the flow above. Takes the parser
   through a one-method interface declared in `ports`, so the handler test can use a fake.
@@ -75,8 +79,11 @@ voice, removing items) is out of scope.
 
 ## System prompt (draft)
 
-> You turn a Russian voice command for a shopping list into items. The text comes from speech
-> recognition: lowercase, no punctuation, numbers as digits. Split it into separate products. For each
+> You interpret a Russian voice command for a shopping list. The text comes from speech
+> recognition: lowercase, no punctuation, numbers as digits. Set "intent" to "add" when the user names
+> products to buy, or only says they are finished, or the text is noise. Set it to "unsupported" for
+> anything else, such as asking what is on the list or removing items. For "add", split the text into
+> separate products. For each
 > product write the name in nominative case with a capital letter, then, if a quantity was said, a
 > comma and the quantity with a short unit (л, кг, г, шт, пачка, бутылка). Keep details that matter
 > when buying, such as fat percentage or brand. Do not invent products or quantities. Set "done" to
@@ -86,11 +93,12 @@ voice, removing items) is out of scope.
 
 ## Testing
 
-- Handler test with a fake parser: items reach `AddItem`; parser error adds the raw phrase; `done`
-  ends the session; empty command does not call the parser; allowlist rejects other skills and users.
+- Handler test with a fake parser: items reach `AddItem`; parser error adds the raw phrase;
+  `unsupported` adds nothing and keeps the session; `done` ends the session; empty command does not call the parser; allowlist rejects other skills and users.
 - `go test -race ./...` passes.
 - Manual check against real OpenRouter with the spike phrases, including
-  `молоко 2 литра пачку масла 82 процента полкило фарша и хлеба и 3 яйца` and `все спасибо`; latency
+  `молоко 2 литра пачку масла 82 процента полкило фарша и хлеба и 3 яйца`, `все спасибо` and
+  `что в списке`; latency
   read from logs to confirm the 2.5 s timeout has headroom.
 - Listen on the Station how TTS reads short units ("2 л", "1 пачка"). If it sounds wrong, fill the
   response `tts` field with spelled-out units; not planned up front.
