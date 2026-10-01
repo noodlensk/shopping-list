@@ -64,8 +64,8 @@ voice, removing items) is out of scope.
 
 ## Components
 
-- `internal/grocery/adapters/openrouter_item_parser.go`: `Parse(ctx, phrase string) (Parsed, error)`
-  where `Parsed` is `{Intent string; Items []string; Done bool}`. Uses `openrouter.Chat.Send` with a
+- `internal/grocery/adapters/openrouter_phrase_parser.go`: `Parse(ctx, phrase string) (ParsedPhrase, error)`
+  where `ParsedPhrase` is `{Intent string; Items []string; Done bool}`. Uses `openrouter.Chat.Send` with a
   strict JSON schema (`intent: "add" | "unsupported"`, `items: string[]`, `done: boolean`, all
   required, no extra properties). The system prompt is a
   constant so provider-side prompt caching can reuse it. Logs latency and token usage per call.
