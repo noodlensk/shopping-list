@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-10-01
+
+### 🚀 Features
+
+- Add Alice skill webhook spike
+
 ## [0.1.2] - 2025-09-01
 
 ### 🐛 Bug Fixes
