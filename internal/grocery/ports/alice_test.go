@@ -27,6 +27,14 @@ func TestAliceHandler(t *testing.T) {
 		{"other", "me", "не для вас"},
 	}
 
+	if got := call("skill", "me", "хватит"); !strings.Contains(got, `"end_session":true`) {
+		t.Errorf("stop word must end session, got %s", got)
+	}
+
+	if got := call("skill", "me", "молоко"); !strings.Contains(got, `"end_session":false`) {
+		t.Errorf("item must keep session open, got %s", got)
+	}
+
 	for _, c := range cases {
 		if got := call(c.skill, c.user, "молоко"); !strings.Contains(got, c.want) {
 			t.Errorf("skill=%q user=%q: got %s, want %q", c.skill, c.user, got, c.want)

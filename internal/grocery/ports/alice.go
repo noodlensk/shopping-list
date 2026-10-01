@@ -33,6 +33,9 @@ type aliceResponse struct {
 	Version string `json:"version"`
 }
 
+// aliceStopWords end the session; any other phrase keeps it open for the next item.
+var aliceStopWords = []string{"всё", "все", "хватит", "стоп", "спасибо", "это всё", "это все", "нет", "ничего"}
+
 // NewAliceHandler serves the webhook of a private Yandex Dialogs skill.
 // ponytail: spike, echoes the phrase and logs the raw request to learn the real payload and latency.
 // Replace with parsing + AddItem once the skill is proven to work.
@@ -63,8 +66,15 @@ func NewAliceHandler(skillID string, allowedUsers []string, logger *zap.SugaredL
 			resp.Response.Text = "Извините, этот список не для вас."
 		} else {
 			logger.Infow("Alice: request", "raw", json.RawMessage(raw))
-			resp.Response.Text = "Слышу: " + req.Request.Command
-			resp.Response.EndSession = req.Request.Command != ""
+
+			switch cmd := req.Request.Command; {
+			case cmd == "":
+				resp.Response.Text, resp.Response.EndSession = "Что добавить?", false
+			case slices.Contains(aliceStopWords, cmd):
+				resp.Response.Text = "Готово."
+			default:
+				resp.Response.Text, resp.Response.EndSession = "Слышу: "+cmd+". Что ещё?", false
+			}
 		}
 
 		w.Header().Set("Content-Type", "application/json")
