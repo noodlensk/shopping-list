@@ -4,4 +4,10 @@ Telegram:
   - 00000000 # Dmitry
   - 11111111 # Kristina
 Storage:
-  Path: ./grocery.db
+  Path: ./grocery.db# Optional: webhook for a private Yandex Alice skill (Yandex Dialogs).
+# Remove the section to disable. Must be reachable from Yandex over HTTPS (put a reverse proxy in front).
+Alice:
+  Listen: ":8080"
+  SkillID: "00000000-0000-0000-0000-000000000000"
+  AllowedUsers: # session.user.user_id, rejected ids are logged
+  - "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"

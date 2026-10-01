@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
@@ -51,6 +52,15 @@ func run(logger *zap.SugaredLogger) error {
 	app, err := service.NewApplication(db)
 	if err != nil {
 		return err
+	}
+
+	if cfg.Alice.Listen != "" {
+		handler := ports.NewAliceHandler(cfg.Alice.SkillID, cfg.Alice.AllowedUsers, logger)
+
+		go func() {
+			logger.Infof("Alice webhook listening on %s", cfg.Alice.Listen)
+			logger.Fatal(http.ListenAndServe(cfg.Alice.Listen, handler))
+		}()
 	}
 
 	return ports.NewTelegram(cfg.Telegram.Token, cfg.Telegram.AllowedUsers, app, logger)

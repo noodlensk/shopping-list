@@ -17,6 +17,12 @@ type Config struct {
 	Storage struct {
 		Path string
 	}
+	// Alice is optional: empty Listen disables the Yandex Dialogs webhook.
+	Alice struct {
+		Listen       string
+		SkillID      string
+		AllowedUsers []string
+	}
 }
 
 func Parse(paths ...string) (*Config, error) {
@@ -56,6 +62,10 @@ func Parse(paths ...string) (*Config, error) {
 
 	if cfg.Storage.Path == "" {
 		validationErrs = append(validationErrs, "Storage.Path should not be empty")
+	}
+
+	if cfg.Alice.Listen != "" && (cfg.Alice.SkillID == "" || len(cfg.Alice.AllowedUsers) == 0) {
+		validationErrs = append(validationErrs, "Alice.SkillID and Alice.AllowedUsers are required when Alice.Listen is set")
 	}
 
 	if len(validationErrs) > 0 {
