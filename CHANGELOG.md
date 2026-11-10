@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-11-10
+
+### 🚀 Features
+
+- Log Telegram delivery, DB and send timings
+
 ## [0.3.1] - 2026-11-10
 
 ### 📚 Documentation
