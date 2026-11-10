@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2026-11-10
+
+### 📚 Documentation
+
+- Add Alice LLM parsing design
+- Add intents to Alice LLM parsing design
+- Add Alice LLM parsing implementation plan
+
 ## [0.3.0] - 2026-10-01
 
 ### 🚀 Features
