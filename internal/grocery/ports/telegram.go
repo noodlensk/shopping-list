@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/noodlensk/shopping-list/internal/grocery/app"
@@ -28,7 +29,10 @@ func NewTelegram(token string, allowedUsersID []int64, application *app.Applicat
 	updates := bot.GetUpdatesChan(u)
 
 	for update := range updates {
+		received := time.Now()
+
 		logger.Infow("Got message",
+			"tg_lag", received.Sub(update.Message.Time()).String(),
 			"user_name", update.Message.From.String(),
 			"user_id", update.Message.From.ID,
 			"msg", update.Message.Text,
@@ -104,9 +108,16 @@ func NewTelegram(token string, allowedUsersID []int64, application *app.Applicat
 		msg.ReplyMarkup = kb
 		msg.Text = txt
 
+		processed := time.Now()
+
 		if _, err := bot.Send(msg); err != nil {
 			return fmt.Errorf("send message: %w", err)
 		}
+
+		logger.Infow("Replied",
+			"db", processed.Sub(received).String(),
+			"send", time.Since(processed).String(),
+		)
 	}
 
 	return nil
